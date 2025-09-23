@@ -1,3 +1,4 @@
+import { author } from "../models/Author.js";
 import book from "../models/Book.js";
 
 class BookController {
@@ -16,30 +17,33 @@ class BookController {
       const foundBook = await book.findById(id);
       res.status(200).json(foundBook);
     } catch (err) {
-      res
-        .status(500)
-        .json({ message: `${err.message} - falha na requisição do livro` });
+      res.status(500).json({ message: `${err.message} - falha na requisição` });
     }
   }
 
   static async addBook(req, res) {
+    const body = req.body;
     try {
-      const newBook = await book.create(req.body);
+      const foundAuthor = await author.findById(body.author);
+      const newBook = { ...body, author: { ...foundAuthor._doc } };
+      const createBook = await book.create(newBook);
       res.status(201).json({
         message: "criado com sucesso",
-        livro: newBook,
+        book: createBook,
       });
     } catch (err) {
       res
         .status(500)
-        .json({ message: `${err.message} - falha ao cadastrar livro` });
+        .json({ message: `${err.message} - falha ao fazer o cadastro` });
     }
   }
 
   static async updateBook(req, res) {
     try {
       const id = req.params.id;
-      await book.findByIdAndUpdate(id, req.body);
+      const foundAuthor = await author.findById(req.body.author);
+      const updatedBook = { ...req.body, author: { ...foundAuthor._doc } };
+      await book.findByIdAndUpdate(id, updatedBook);
       res.status(200).json({
         message: "livro atualizado com sucesso",
       });
@@ -59,7 +63,19 @@ class BookController {
       });
     } catch (err) {
       res.status(500).json({
-        message: `${err.message} - falha ao tentar remover o livro`,
+        message: `${err.message} - falha ao fazer a remoção`,
+      });
+    }
+  }
+
+  static async findByPublisher(req, res) {
+    try {
+      const publisher = req.query.publisher;
+      const foundBook = await book.find({ publisher: publisher });
+      res.status(200).json(foundBook);
+    } catch (err) {
+      res.status(500).json({
+        message: `${err.message} - falha ao fazer a busca`,
       });
     }
   }
