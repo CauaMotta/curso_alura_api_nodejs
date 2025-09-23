@@ -1,6 +1,8 @@
 import express from 'express'
 import connect from './config/dbConnect.js'
 import routes from './routes/index.js'
+import errorHandler from './middlewares/ErrorHandler.js'
+import notFoundHandler from './middlewares/notFoundHandler.js'
 
 const connection = await connect()
 
@@ -14,5 +16,9 @@ connection.once('open', () => {
 
 const app = express()
 routes(app)
+
+app.use(notFoundHandler)
+
+app.use(errorHandler)
 
 export default app
