@@ -67,10 +67,16 @@ class BookController {
     }
   }
 
-  static async findByPublisher(req, res, next) {
+  static async findByFilter(req, res, next) {
     try {
-      const publisher = req.query.publisher
-      const foundBook = await book.find({ publisher: publisher })
+      const { publisher, title } = req.query
+
+      const search = {}
+
+      if (publisher) search.publisher = { $regex: publisher, $options: 'i' }
+      if (title) search.title = { $regex: title, $options: 'i' }
+
+      const foundBook = await book.find(search)
       if (foundBook !== null) {
         res.status(200).json(foundBook)
       } else {
