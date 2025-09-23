@@ -1,6 +1,5 @@
 import NotFoundError from '../errors/NotFoundError.js'
-import { author } from '../models/Author.js'
-import book from '../models/Book.js'
+import { author, book } from '../models/index.js'
 
 class BookController {
   static async findBooks(req, res, next) {
