@@ -4,8 +4,8 @@ import { author, book } from '../models/index.js'
 class BookController {
   static async findBooks(req, res, next) {
     try {
-      const books = await book.find({})
-      res.status(200).json(books)
+      req.result = book.find()
+      next()
     } catch (err) {
       next(err)
     }
@@ -76,13 +76,12 @@ class BookController {
       if (publisher) search.publisher = { $regex: publisher, $options: 'i' }
       if (title) search.title = { $regex: title, $options: 'i' }
 
-      const foundBook = await book.find(search)
+      const foundBook = book.find(search)
       if (foundBook !== null) {
-        res.status(200).json(foundBook)
+        req.result = foundBook
+        next()
       } else {
-        throw new NotFoundError(
-          `Livro não encontrado com EDITORA - ${publisher}`
-        )
+        res.status(200).send([])
       }
     } catch (err) {
       next(err)

@@ -4,8 +4,8 @@ import { author } from '../models/index.js'
 class AuthorController {
   static async findAuthors(req, res, next) {
     try {
-      const authors = await author.find({})
-      res.status(200).json(authors)
+      req.result = author.find()
+      next()
     } catch (err) {
       next(err)
     }
